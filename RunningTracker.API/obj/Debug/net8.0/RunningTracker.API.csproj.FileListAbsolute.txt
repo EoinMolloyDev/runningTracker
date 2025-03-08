@@ -170,4 +170,5 @@ C:\Users\EoinM\OneDrive\Desktop\Development Projects\AI_Projects\RunningTracker\
 C:\Users\EoinM\OneDrive\Desktop\Development Projects\AI_Projects\RunningTracker\RunningTracker.API\obj\Debug\net8.0\RunningTracker.API.pdb
 C:\Users\EoinM\OneDrive\Desktop\Development Projects\AI_Projects\RunningTracker\RunningTracker.API\obj\Debug\net8.0\RunningTracker.API.genruntimeconfig.cache
 C:\Users\EoinM\OneDrive\Desktop\Development Projects\AI_Projects\RunningTracker\RunningTracker.API\obj\Debug\net8.0\ref\RunningTracker.API.dll
+C:\Users\EoinM\OneDrive\Desktop\Development Projects\AI_Projects\RunningTracker\RunningTracker.API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\EoinM\OneDrive\Desktop\Development Projects\AI_Projects\RunningTracker\RunningTracker.API\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

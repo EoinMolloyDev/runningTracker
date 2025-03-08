@@ -28,22 +28,3 @@ build/
 *.userosscache
 *.sln.docstates
 
-# Ignore folders in specific projects
-API/node_modules/
-API/.env
-API/.vs/
-API/dist/
-API/obj/
-API/bin/
-
-darts-client/node_modules/
-darts-client/.env
-darts-client/.vs/
-darts-client/dist/
-
-# Ignore IDE settings
-.idea/
-/API/bin
-/API/bin/Debug
-API/bin/Debug/net8.0/API.pdb
-/API/bin

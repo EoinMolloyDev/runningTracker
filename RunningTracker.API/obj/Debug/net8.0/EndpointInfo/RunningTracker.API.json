@@ -1,10 +1,106 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "RunningTracker.API",
-    "version": "1.0"
+    "title": "Running Tracker API",
+    "version": "v1"
   },
   "paths": {
+    "/api/Auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponseDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Routes": {
       "get": {
         "tags": [
@@ -661,8 +757,88 @@
   },
   "components": {
     "schemas": {
+      "AuthResponseDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "nullable": true
+          },
+          "userId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LoginDto": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RegisterDto": {
+        "required": [
+          "email",
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 50,
+            "minLength": 3,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "maxLength": 100,
+            "minLength": 6,
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "RunningActivity": {
         "required": [
+          "createdAt",
           "date",
           "distance",
           "duration"
@@ -672,15 +848,6 @@
           "id": {
             "type": "integer",
             "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
           },
           "date": {
             "type": "string",
@@ -696,18 +863,6 @@
             "minimum": 1,
             "type": "integer",
             "format": "int32"
-          },
-          "pace": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
-          },
-          "speed": {
-            "type": "number",
-            "format": "double",
-            "nullable": true,
-            "readOnly": true
           },
           "notes": {
             "maxLength": 500,
@@ -729,30 +884,10 @@
             "format": "int32",
             "nullable": true
           },
-          "user": {
-            "$ref": "#/components/schemas/User"
-          },
           "routeId": {
             "type": "integer",
             "format": "int32",
             "nullable": true
-          },
-          "route": {
-            "$ref": "#/components/schemas/RunningRoute"
-          }
-        },
-        "additionalProperties": false
-      },
-      "RunningRoute": {
-        "required": [
-          "distance",
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "format": "int32"
           },
           "createdAt": {
             "type": "string",
@@ -762,6 +897,39 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "route": {
+            "$ref": "#/components/schemas/RunningRoute"
+          },
+          "pace": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "readOnly": true
+          },
+          "speed": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RunningRoute": {
+        "required": [
+          "createdAt",
+          "distance",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
           },
           "name": {
             "maxLength": 100,
@@ -809,6 +977,15 @@
             "format": "int32",
             "nullable": true
           },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "user": {
             "$ref": "#/components/schemas/User"
           },
@@ -824,8 +1001,10 @@
       },
       "User": {
         "required": [
+          "createdAt",
           "email",
           "passwordHash",
+          "passwordSalt",
           "username"
         ],
         "type": "object",
@@ -833,15 +1012,6 @@
           "id": {
             "type": "integer",
             "format": "int32"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
           },
           "username": {
             "maxLength": 50,
@@ -855,6 +1025,10 @@
             "format": "email"
           },
           "passwordHash": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "passwordSalt": {
             "minLength": 1,
             "type": "string"
           },
@@ -872,12 +1046,12 @@
           },
           "weight": {
             "type": "number",
-            "format": "double",
+            "format": "float",
             "nullable": true
           },
           "height": {
             "type": "number",
-            "format": "double",
+            "format": "float",
             "nullable": true
           },
           "dateOfBirth": {
@@ -889,16 +1063,45 @@
             "type": "string",
             "nullable": true
           },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
           "runningActivities": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/RunningActivity"
             },
             "nullable": true
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunningRoute"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        "name": "Authorization",
+        "in": "header"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
 }

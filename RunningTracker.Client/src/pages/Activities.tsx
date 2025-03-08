@@ -25,9 +25,9 @@ const Activities: React.FC = () => {
   return (
     <Container>
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1>Running Activities</h1>
+        <h1>Running tracking</h1>
         <Link to="/activities/new">
-          <Button variant="success">Add New Activity</Button>
+          <Button variant="success">Add Activity</Button>
         </Link>
       </div>
 

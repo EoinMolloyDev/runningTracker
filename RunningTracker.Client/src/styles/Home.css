@@ -48,6 +48,19 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
+.feature-icon {
+  font-size: 2.5rem;
+  color: #3498db;
+  margin-bottom: 1rem;
+}
+
+.feature-icon i {
+  background-color: rgba(52, 152, 219, 0.1);
+  padding: 1rem;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 @media (max-width: 768px) {
   .banner {
     height: 300px;

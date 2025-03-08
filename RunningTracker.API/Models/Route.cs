@@ -1,9 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RunningTracker.API.Models
 {
-    public class RunningRoute : BaseEntity
+    public class RunningRoute
     {
+        [Key]
+        public int Id { get; set; }
+
         [Required]
         [StringLength(100)]
         public string Name { get; set; } = string.Empty;
@@ -28,6 +32,12 @@ namespace RunningTracker.API.Models
         public double? ElevationLoss { get; set; } // in meters
         
         public int? UserId { get; set; }
+        
+        [Required]
+        public DateTime CreatedAt { get; set; }
+        
+        public DateTime? UpdatedAt { get; set; }
+        
         public User? User { get; set; }
         
         public ICollection<RunningActivity> RunningActivities { get; set; } = new List<RunningActivity>();

@@ -32,7 +32,7 @@ namespace RunningTracker.API.Data
 
             modelBuilder.Entity<RunningRoute>()
                 .HasOne(r => r.User)
-                .WithMany()
+                .WithMany(u => u.Routes)
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
         }
@@ -40,21 +40,51 @@ namespace RunningTracker.API.Data
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             // Update timestamps for modified entities
-            var entries = ChangeTracker
-                .Entries()
-                .Where(e => e.Entity is BaseEntity && (e.State == EntityState.Added || e.State == EntityState.Modified));
+            var userEntries = ChangeTracker
+                .Entries<User>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-            foreach (var entityEntry in entries)
+            foreach (var entityEntry in userEntries)
             {
-                var entity = (BaseEntity)entityEntry.Entity;
-
                 if (entityEntry.State == EntityState.Added)
                 {
-                    entity.CreatedAt = DateTime.UtcNow;
+                    entityEntry.Entity.CreatedAt = DateTime.UtcNow;
                 }
                 else
                 {
-                    entity.UpdatedAt = DateTime.UtcNow;
+                    entityEntry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var activityEntries = ChangeTracker
+                .Entries<RunningActivity>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach (var entityEntry in activityEntries)
+            {
+                if (entityEntry.State == EntityState.Added)
+                {
+                    entityEntry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    entityEntry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var routeEntries = ChangeTracker
+                .Entries<RunningRoute>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach (var entityEntry in routeEntries)
+            {
+                if (entityEntry.State == EntityState.Added)
+                {
+                    entityEntry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    entityEntry.Entity.UpdatedAt = DateTime.UtcNow;
                 }
             }
 
