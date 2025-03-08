@@ -1,0 +1,49 @@
+# General
+.DS_Store
+Thumbs.db
+
+# Root-level folders to ignore
+.vs/
+*.log
+*.tmp
+
+# Node.js (for the client and API, if applicable)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.*
+
+# Build output (for client and API)
+dist/
+build/
+
+# Specific to Visual Studio
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore folders in specific projects
+API/node_modules/
+API/.env
+API/.vs/
+API/dist/
+API/obj/
+API/bin/
+
+darts-client/node_modules/
+darts-client/.env
+darts-client/.vs/
+darts-client/dist/
+
+# Ignore IDE settings
+.idea/
+/API/bin
+/API/bin/Debug
+API/bin/Debug/net8.0/API.pdb
+/API/bin
