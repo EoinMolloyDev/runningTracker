@@ -35,9 +35,6 @@ const Dashboard: React.FC = () => {
   const [activities, setActivities] = useState<RunningActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
-    totalActivities: 0,
-    totalDistance: 0,
-    totalDuration: 0,
     averagePace: 0,
     averageSpeed: 0,
     longestRun: 0,
@@ -67,9 +64,6 @@ const Dashboard: React.FC = () => {
           const fastestPace = paces.length > 0 ? Math.min(...paces) : 0;
           
           setStats({
-            totalActivities: activitiesData.length,
-            totalDistance: parseFloat(totalDistance.toFixed(2)),
-            totalDuration: totalDuration,
             averagePace: parseFloat(averagePace.toFixed(2)),
             averageSpeed: parseFloat(averageSpeed.toFixed(2)),
             longestRun: parseFloat(longestRun.toFixed(2)),
@@ -193,8 +187,8 @@ const Dashboard: React.FC = () => {
     .slice(0, 5);
 
   return (
-    <Container>
-      <h1 className="my-4">Running Dashboard</h1>
+    <Container fluid className="dashboard-container">
+      <h1 className="my-3 mb-4">Running Dashboard</h1>
       
       {loading ? (
         <div className="text-center my-5">
@@ -206,62 +200,35 @@ const Dashboard: React.FC = () => {
         <>
           {/* Stats Cards */}
           <Row className="mb-4">
-            <Col md={4} className="mb-3">
-              <Card className="h-100 total-activities-card">
-                <Card.Body>
-                  <Card.Title>Total Activities</Card.Title>
-                  <h2>{stats.totalActivities}</h2>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Card className="h-100 total-distance-card">
-                <Card.Body>
-                  <Card.Title>Total Distance</Card.Title>
-                  <h2>{stats.totalDistance} km</h2>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Card className="h-100 total-duration-card">
-                <Card.Body>
-                  <Card.Title>Total Duration</Card.Title>
-                  <h2>{formatDurationLong(stats.totalDuration)}</h2>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-          
-          <Row className="mb-4">
             <Col md={3} className="mb-3">
               <Card className="h-100 average-pace-card">
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Average Pace</Card.Title>
-                  <h2>{formatPace(stats.averagePace)}</h2>
+                  <h3>{formatPace(stats.averagePace)}</h3>
                 </Card.Body>
               </Card>
             </Col>
             <Col md={3} className="mb-3">
               <Card className="h-100 average-speed-card">
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Average Speed</Card.Title>
-                  <h2>{stats.averageSpeed} km/h</h2>
+                  <h3>{stats.averageSpeed} km/h</h3>
                 </Card.Body>
               </Card>
             </Col>
             <Col md={3} className="mb-3">
               <Card className="h-100 longest-run-card">
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Longest Run</Card.Title>
-                  <h2>{stats.longestRun} km</h2>
+                  <h3>{stats.longestRun} km</h3>
                 </Card.Body>
               </Card>
             </Col>
             <Col md={3} className="mb-3">
               <Card className="h-100 fastest-pace-card">
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Fastest Pace</Card.Title>
-                  <h2>{formatPace(stats.fastestPace)}</h2>
+                  <h3>{formatPace(stats.fastestPace)}</h3>
                 </Card.Body>
               </Card>
             </Col>
@@ -269,11 +236,11 @@ const Dashboard: React.FC = () => {
           
           {/* Charts */}
           <Row className="mb-4">
-            <Col lg={6} className="mb-4">
+            <Col lg={6} className="mb-3">
               <Card>
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Distance Over Time (Last 30 Days)</Card.Title>
-                  <div style={{ height: '300px' }}>
+                  <div style={{ height: '250px' }}>
                     <Line 
                       data={prepareDistanceOverTimeData()} 
                       options={{ 
@@ -292,6 +259,11 @@ const Dashboard: React.FC = () => {
                               text: 'Date'
                             }
                           }
+                        },
+                        plugins: {
+                          legend: {
+                            display: false
+                          }
                         }
                       }} 
                     />
@@ -300,11 +272,11 @@ const Dashboard: React.FC = () => {
               </Card>
             </Col>
             
-            <Col lg={6} className="mb-4">
+            <Col lg={6} className="mb-3">
               <Card>
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Monthly Distance</Card.Title>
-                  <div style={{ height: '300px' }}>
+                  <div style={{ height: '250px' }}>
                     <Bar 
                       data={prepareMonthlyDistanceData()} 
                       options={{ 
@@ -323,6 +295,11 @@ const Dashboard: React.FC = () => {
                               text: 'Day of Month'
                             }
                           }
+                        },
+                        plugins: {
+                          legend: {
+                            display: false
+                          }
                         }
                       }} 
                     />
@@ -332,12 +309,12 @@ const Dashboard: React.FC = () => {
             </Col>
           </Row>
           
-          <Row className="mb-4">
-            <Col md={6} className="mb-4">
+          <Row className="mb-3">
+            <Col md={6} className="mb-3">
               <Card>
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Pace Distribution</Card.Title>
-                  <div style={{ height: '300px' }}>
+                  <div style={{ height: '250px' }}>
                     <Pie 
                       data={preparePaceDistributionData()} 
                       options={{ 
@@ -345,6 +322,12 @@ const Dashboard: React.FC = () => {
                         plugins: {
                           legend: {
                             position: 'right',
+                            labels: {
+                              boxWidth: 15,
+                              font: {
+                                size: 11
+                              }
+                            }
                           }
                         }
                       }} 
@@ -354,14 +337,14 @@ const Dashboard: React.FC = () => {
               </Card>
             </Col>
             
-            <Col md={6} className="mb-4">
+            <Col md={6} className="mb-3">
               <Card>
-                <Card.Body>
+                <Card.Body className="compact-card">
                   <Card.Title>Recent Activities</Card.Title>
                   {recentActivities.length === 0 ? (
                     <p>No recent activities found.</p>
                   ) : (
-                    <Table striped bordered hover responsive>
+                    <Table striped bordered hover responsive size="sm">
                       <thead>
                         <tr>
                           <th>Date</th>

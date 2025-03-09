@@ -1,26 +1,46 @@
 .card {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 0.75rem;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .card-title {
   color: #495057;
   font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
 }
 
-h2 {
+h3 {
   color: #343a40;
   font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0;
 }
 
 .table th {
   background-color: #f8f9fa;
   font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem;
+}
+
+.table td {
+  font-size: 0.85rem;
+  padding: 0.5rem;
+}
+
+.compact-card {
+  padding: 0.75rem 1rem;
+}
+
+.dashboard-container {
+  padding: 1.25rem 1.5rem;
 }
 
 /* Custom colors for stats cards */
