@@ -12,6 +12,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
 # Environment variables
 .env
@@ -47,11 +48,16 @@ RunningTracker.Client/node_modules/
 RunningTracker.Client/.env
 RunningTracker.Client/.vs/
 RunningTracker.Client/dist/
+RunningTracker.Client/package-lock.json
+RunningTracker.Client/package.json
 
 # Ignore IDE settings
 .idea/
-RunningTracker.Client/package-lock.json
 
 # Ignore all bin and obj folders recursively
 **/bin/
 **/obj/
+
+# Ignore all package.json files
+**/package.json
+**/package-lock.json
