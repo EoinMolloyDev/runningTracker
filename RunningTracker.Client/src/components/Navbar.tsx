@@ -59,6 +59,7 @@ const Navbar: React.FC = () => {
             
             {isAuthenticated ? (
               <>
+                <Link to="/dashboard" className="nav-link">Dashboard</Link>
                 <Link to="/activities" className="nav-link">Activities</Link>
                 <Link to="/routes" className="nav-link">Routes</Link>
                 <Dropdown align="end">

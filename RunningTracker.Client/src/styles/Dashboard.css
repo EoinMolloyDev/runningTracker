@@ -1,0 +1,53 @@
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-title {
+  color: #495057;
+  font-weight: 600;
+}
+
+h2 {
+  color: #343a40;
+  font-weight: 700;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+/* Custom colors for stats cards */
+.total-activities-card {
+  border-left: 4px solid #4e73df;
+}
+
+.total-distance-card {
+  border-left: 4px solid #1cc88a;
+}
+
+.total-duration-card {
+  border-left: 4px solid #36b9cc;
+}
+
+.average-pace-card {
+  border-left: 4px solid #f6c23e;
+}
+
+.average-speed-card {
+  border-left: 4px solid #e74a3b;
+}
+
+.longest-run-card {
+  border-left: 4px solid #6f42c1;
+}
+
+.fastest-pace-card {
+  border-left: 4px solid #fd7e14;
+} 

@@ -61,3 +61,7 @@ RunningTracker.Client/package.json
 # Ignore all package.json files
 **/package.json
 **/package-lock.json
+remove-package-json.bat
+commit-changes.bat
+remove-dlls-from-git.bat
+remove-dlls-from-git.ps1

@@ -9,6 +9,7 @@ import RoutesPage from './pages/Routes';
 import RouteForm from './pages/RouteForm';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 import authService, { AUTH_STATE_CHANGE_EVENT } from './services/authService';
 
 // Protected route wrapper component
@@ -91,6 +92,11 @@ function App() {
           <Route path="/routes/:id" element={
             <RequireAuth>
               <RouteForm />
+            </RequireAuth>
+          } />
+          <Route path="/dashboard" element={
+            <RequireAuth>
+              <Dashboard />
             </RequireAuth>
           } />
           
