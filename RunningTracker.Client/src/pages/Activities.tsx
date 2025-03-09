@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Table, Button } from 'react-bootstrap';
+import { Container, Table, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { RunningActivity, activitiesApi } from '../services/api';
+import { formatDuration, formatPace } from '../utils/formatters';
 
 const Activities: React.FC = () => {
   const [activities, setActivities] = useState<RunningActivity[]>([]);
@@ -43,6 +44,7 @@ const Activities: React.FC = () => {
               <th>Distance (km)</th>
               <th>Duration</th>
               <th>Pace (min/km)</th>
+              <th>Weather</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -50,9 +52,18 @@ const Activities: React.FC = () => {
             {activities.map(activity => (
               <tr key={activity.id}>
                 <td>{new Date(activity.date).toLocaleDateString()}</td>
-                <td>{activity.distance}</td>
-                <td>{Math.floor(activity.duration / 60)}:{(activity.duration % 60).toString().padStart(2, '0')}</td>
-                <td>{activity.pace || 'N/A'}</td>
+                <td>{activity.distance.toFixed(2)}</td>
+                <td>{formatDuration(activity.duration)}</td>
+                <td>{formatPace(activity.pace)}</td>
+                <td>
+                  {activity.weatherConditions ? (
+                    <Badge bg={getWeatherBadgeColor(activity.weatherConditions)}>
+                      {activity.weatherConditions}
+                    </Badge>
+                  ) : (
+                    '-'
+                  )}
+                </td>
                 <td>
                   <Link to={`/activities/${activity.id}`}>
                     <Button variant="primary" size="sm" className="me-2">Edit</Button>
@@ -65,6 +76,22 @@ const Activities: React.FC = () => {
       )}
     </Container>
   );
+};
+
+// Helper function to determine badge color based on weather condition
+const getWeatherBadgeColor = (weatherCondition: string): string => {
+  switch (weatherCondition) {
+    case 'Cold':
+      return 'info';
+    case 'Normal':
+      return 'success';
+    case 'Warm':
+      return 'warning';
+    case 'Very Warm':
+      return 'danger';
+    default:
+      return 'secondary';
+  }
 };
 
 export default Activities; 

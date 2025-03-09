@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Form, Button, Card } from 'react-bootstrap';
+import { Container, Form, Button, Card, Row, Col } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { RunningActivity, activitiesApi } from '../services/api';
+
+// Weather condition options
+const WEATHER_CONDITIONS = ['Normal', 'Cold', 'Warm', 'Very Warm'];
 
 const ActivityForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +18,10 @@ const ActivityForm: React.FC = () => {
     notes: ''
   });
 
+  // Separate state for minutes and seconds
+  const [durationMinutes, setDurationMinutes] = useState<number>(0);
+  const [durationSeconds, setDurationSeconds] = useState<number>(0);
+
   useEffect(() => {
     if (isEditing) {
       const fetchActivity = async () => {
@@ -26,6 +33,11 @@ const ActivityForm: React.FC = () => {
             date: new Date(response.data.date).toISOString().split('T')[0]
           };
           setActivity(formattedActivity);
+          
+          // Calculate minutes and seconds from total seconds
+          const totalSeconds = formattedActivity.duration;
+          setDurationMinutes(Math.floor(totalSeconds / 60));
+          setDurationSeconds(totalSeconds % 60);
         } catch (error) {
           console.error('Error fetching activity:', error);
         }
@@ -34,12 +46,36 @@ const ActivityForm: React.FC = () => {
     }
   }, [id, isEditing]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setActivity(prev => ({
       ...prev,
       [name]: value
     }));
+  };
+
+  // Handle duration changes (minutes and seconds)
+  const handleDurationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const numValue = parseInt(value) || 0;
+    
+    if (name === 'durationMinutes') {
+      setDurationMinutes(numValue);
+      // Update the total duration in seconds
+      setActivity(prev => ({
+        ...prev,
+        duration: numValue * 60 + durationSeconds
+      }));
+    } else if (name === 'durationSeconds') {
+      // Ensure seconds are between 0-59
+      const validSeconds = Math.min(Math.max(numValue, 0), 59);
+      setDurationSeconds(validSeconds);
+      // Update the total duration in seconds
+      setActivity(prev => ({
+        ...prev,
+        duration: durationMinutes * 60 + validSeconds
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -88,24 +124,50 @@ const ActivityForm: React.FC = () => {
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Duration (seconds)</Form.Label>
-              <Form.Control
-                type="number"
-                name="duration"
-                value={activity.duration}
-                onChange={handleChange}
-                required
-              />
+              <Form.Label>Duration</Form.Label>
+              <Row>
+                <Col>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    name="durationMinutes"
+                    value={durationMinutes}
+                    onChange={handleDurationChange}
+                    placeholder="Minutes"
+                    required
+                  />
+                  <Form.Text className="text-muted">Minutes</Form.Text>
+                </Col>
+                <Col>
+                  <Form.Control
+                    type="number"
+                    min="0"
+                    max="59"
+                    name="durationSeconds"
+                    value={durationSeconds}
+                    onChange={handleDurationChange}
+                    placeholder="Seconds"
+                    required
+                  />
+                  <Form.Text className="text-muted">Seconds</Form.Text>
+                </Col>
+              </Row>
             </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Weather Conditions</Form.Label>
-              <Form.Control
-                type="text"
+              <Form.Select
                 name="weatherConditions"
                 value={activity.weatherConditions || ''}
                 onChange={handleChange}
-              />
+              >
+                <option value="">Select weather condition</option>
+                {WEATHER_CONDITIONS.map(condition => (
+                  <option key={condition} value={condition}>
+                    {condition}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
 
             <Form.Group className="mb-3">

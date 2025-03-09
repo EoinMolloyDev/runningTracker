@@ -16,6 +16,7 @@ import { Line, Bar, Pie } from 'react-chartjs-2';
 import { format, parseISO, subDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay } from 'date-fns';
 import { RunningActivity, activitiesApi } from '../services/api';
 import '../styles/Dashboard.css';
+import { formatDuration, formatDurationLong, formatPace } from '../utils/formatters';
 
 // Register ChartJS components
 ChartJS.register(
@@ -186,15 +187,6 @@ const Dashboard: React.FC = () => {
     };
   };
 
-  // Format duration from seconds to HH:MM:SS
-  const formatDuration = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const remainingSeconds = seconds % 60;
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
   // Recent activities table
   const recentActivities = activities
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -234,7 +226,7 @@ const Dashboard: React.FC = () => {
               <Card className="h-100 total-duration-card">
                 <Card.Body>
                   <Card.Title>Total Duration</Card.Title>
-                  <h2>{formatDuration(stats.totalDuration)}</h2>
+                  <h2>{formatDurationLong(stats.totalDuration)}</h2>
                 </Card.Body>
               </Card>
             </Col>
@@ -245,7 +237,7 @@ const Dashboard: React.FC = () => {
               <Card className="h-100 average-pace-card">
                 <Card.Body>
                   <Card.Title>Average Pace</Card.Title>
-                  <h2>{stats.averagePace} min/km</h2>
+                  <h2>{formatPace(stats.averagePace)}</h2>
                 </Card.Body>
               </Card>
             </Col>
@@ -269,7 +261,7 @@ const Dashboard: React.FC = () => {
               <Card className="h-100 fastest-pace-card">
                 <Card.Body>
                   <Card.Title>Fastest Pace</Card.Title>
-                  <h2>{stats.fastestPace} min/km</h2>
+                  <h2>{formatPace(stats.fastestPace)}</h2>
                 </Card.Body>
               </Card>
             </Col>
@@ -383,8 +375,8 @@ const Dashboard: React.FC = () => {
                           <tr key={activity.id}>
                             <td>{format(parseISO(activity.date), 'MMM dd, yyyy')}</td>
                             <td>{activity.distance} km</td>
-                            <td>{Math.floor(activity.duration / 60)}:{(activity.duration % 60).toString().padStart(2, '0')}</td>
-                            <td>{activity.pace ? `${activity.pace.toFixed(2)} min/km` : 'N/A'}</td>
+                            <td>{formatDuration(activity.duration)}</td>
+                            <td>{activity.pace ? formatPace(activity.pace) : 'N/A'}</td>
                           </tr>
                         ))}
                       </tbody>
