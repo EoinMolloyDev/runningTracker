@@ -1,0 +1,65 @@
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header h5 {
+  font-weight: 600;
+  color: #343a40;
+}
+
+.badge {
+  margin-left: 0.5rem;
+  font-weight: 500;
+}
+
+.progress {
+  height: 0.8rem;
+  border-radius: 0.5rem;
+}
+
+.progress-bar {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.small {
+  font-size: 0.8rem;
+}
+
+/* Goal type colors */
+.goal-total-distance {
+  border-left: 4px solid #4e73df;
+}
+
+.goal-total-activities {
+  border-left: 4px solid #1cc88a;
+}
+
+.goal-average-pace {
+  border-left: 4px solid #f6c23e;
+}
+
+.goal-longest-run {
+  border-left: 4px solid #6f42c1;
+}
+
+.goal-fastest-pace {
+  border-left: 4px solid #e74a3b;
+} 

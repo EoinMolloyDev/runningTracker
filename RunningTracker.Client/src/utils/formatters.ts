@@ -27,9 +27,13 @@ export const formatDurationLong = (seconds: number): string => {
  * @returns Formatted pace string in MM:SS format
  */
 export const formatPace = (pace: number | undefined): string => {
-  if (pace === undefined || pace === null) return 'N/A';
+  if (pace === undefined || pace === null || isNaN(Number(pace))) return 'N/A';
   
-  const minutes = Math.floor(pace);
-  const seconds = Math.round((pace - minutes) * 60);
+  // Ensure pace is a number
+  const numPace = Number(pace);
+  if (numPace <= 0) return 'N/A';
+  
+  const minutes = Math.floor(numPace);
+  const seconds = Math.round((numPace - minutes) * 60);
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }; 
