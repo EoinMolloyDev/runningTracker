@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RunningTracker.API.Data;
 using RunningTracker.API.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,10 +14,12 @@ namespace RunningTracker.API.Controllers
     public class RunningActivitiesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly GoalsController _goalsController;
 
         public RunningActivitiesController(ApplicationDbContext context)
         {
             _context = context;
+            _goalsController = new GoalsController(context);
         }
 
         // GET: api/RunningActivities
@@ -47,6 +50,9 @@ namespace RunningTracker.API.Controllers
             _context.RunningActivities.Add(runningActivity);
             await _context.SaveChangesAsync();
 
+            // Update goal progress
+            await UpdateGoalProgress();
+
             return CreatedAtAction(nameof(GetRunningActivity), new { id = runningActivity.Id }, runningActivity);
         }
 
@@ -64,6 +70,9 @@ namespace RunningTracker.API.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                
+                // Update goal progress
+                await UpdateGoalProgress();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -92,6 +101,9 @@ namespace RunningTracker.API.Controllers
 
             _context.RunningActivities.Remove(runningActivity);
             await _context.SaveChangesAsync();
+            
+            // Update goal progress
+            await UpdateGoalProgress();
 
             return NoContent();
         }
@@ -99,6 +111,20 @@ namespace RunningTracker.API.Controllers
         private bool RunningActivityExists(int id)
         {
             return _context.RunningActivities.Any(e => e.Id == id);
+        }
+        
+        // Helper method to update goal progress
+        private async Task UpdateGoalProgress()
+        {
+            try
+            {
+                await _goalsController.UpdateAllGoalsProgress();
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't fail the activity operation
+                Console.WriteLine($"Error updating goal progress: {ex.Message}");
+            }
         }
     }
 } 

@@ -58,6 +58,16 @@ export interface Goal {
   userId?: number;
 }
 
+export interface CreateGoalDTO {
+  name: string;
+  description?: string;
+  targetValue: number;
+  goalType: GoalType;
+  timeframe: GoalTimeframe;
+  startDate: string;
+  endDate: string;
+}
+
 export enum GoalType {
   TotalDistance = 'TotalDistance',
   TotalActivities = 'TotalActivities',
@@ -95,14 +105,27 @@ api.interceptors.request.use(
   }
 );
 
-// Add a response interceptor to handle authentication errors
+// Add a response interceptor to handle errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
-      // Unauthorized, clear user data and redirect to login
-      authService.logout();
-      window.location.href = '/login';
+    // Log detailed error information
+    console.error('API Error:', error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+      console.error('Response headers:', error.response.headers);
+      
+      // Handle authentication errors
+      if (error.response.status === 401) {
+        // Unauthorized, clear user data and redirect to login
+        authService.logout();
+        window.location.href = '/login';
+      }
+    } else if (error.request) {
+      console.error('Request error:', error.request);
+    } else {
+      console.error('Error message:', error.message);
     }
     return Promise.reject(error);
   }
@@ -137,128 +160,30 @@ export const usersApi = {
   getUserActivities: (id: number) => api.get<RunningActivity[]>(`/users/${id}/runningactivities`),
 };
 
-// Goals API (client-side only for now)
+// Goals API
 export const goalsApi = {
-  getAll: () => {
-    // Get goals from localStorage or return empty array
-    const goals = localStorage.getItem('running_goals');
-    return Promise.resolve({ data: goals ? JSON.parse(goals) : [] });
+  getAll: () => api.get<Goal[]>('/goals'),
+  getById: (id: number) => api.get<Goal>(`/goals/${id}`),
+  create: (goal: any) => {
+    // Ensure the data is in the correct format
+    const formattedGoal = {
+      name: goal.name,
+      description: goal.description || '',
+      targetValue: Number(goal.targetValue),
+      goalType: goal.goalType,
+      timeframe: goal.timeframe,
+      startDate: goal.startDate,
+      endDate: goal.endDate
+    };
+    
+    console.log('API sending goal data:', formattedGoal);
+    return api.post<Goal>('/goals', formattedGoal);
   },
-  
-  getById: (id: number) => {
-    const goals = localStorage.getItem('running_goals');
-    const parsedGoals: Goal[] = goals ? JSON.parse(goals) : [];
-    const goal = parsedGoals.find(g => g.id === id);
-    return Promise.resolve({ data: goal });
-  },
-  
-  create: (goal: Goal) => {
-    const goals = localStorage.getItem('running_goals');
-    const parsedGoals: Goal[] = goals ? JSON.parse(goals) : [];
-    
-    // Generate a new ID
-    const newId = parsedGoals.length > 0 
-      ? Math.max(...parsedGoals.map(g => g.id || 0)) + 1 
-      : 1;
-    
-    const newGoal = { ...goal, id: newId };
-    parsedGoals.push(newGoal);
-    
-    localStorage.setItem('running_goals', JSON.stringify(parsedGoals));
-    return Promise.resolve({ data: newGoal });
-  },
-  
-  update: (id: number, goal: Goal) => {
-    const goals = localStorage.getItem('running_goals');
-    const parsedGoals: Goal[] = goals ? JSON.parse(goals) : [];
-    
-    const index = parsedGoals.findIndex(g => g.id === id);
-    if (index !== -1) {
-      parsedGoals[index] = { ...goal, id };
-      localStorage.setItem('running_goals', JSON.stringify(parsedGoals));
-    }
-    
-    return Promise.resolve({ data: null });
-  },
-  
-  delete: (id: number) => {
-    const goals = localStorage.getItem('running_goals');
-    const parsedGoals: Goal[] = goals ? JSON.parse(goals) : [];
-    
-    const filteredGoals = parsedGoals.filter(g => g.id !== id);
-    localStorage.setItem('running_goals', JSON.stringify(filteredGoals));
-    
-    return Promise.resolve({ data: null });
-  },
-  
-  updateProgress: (activities: RunningActivity[]) => {
-    const goals = localStorage.getItem('running_goals');
-    const parsedGoals: Goal[] = goals ? JSON.parse(goals) : [];
-    
-    if (parsedGoals.length === 0 || activities.length === 0) {
-      return Promise.resolve({ data: parsedGoals });
-    }
-    
-    const updatedGoals = parsedGoals.map(goal => {
-      // Filter activities within the goal's timeframe
-      const startDate = new Date(goal.startDate);
-      const endDate = new Date(goal.endDate);
-      const relevantActivities = activities.filter(activity => {
-        const activityDate = new Date(activity.date);
-        return activityDate >= startDate && activityDate <= endDate;
-      });
-      
-      let currentValue = 0;
-      
-      // Calculate current value based on goal type
-      switch (goal.goalType) {
-        case GoalType.TotalDistance:
-          currentValue = relevantActivities.reduce((sum, activity) => 
-            sum + (typeof activity.distance === 'number' ? activity.distance : 0), 0);
-          break;
-          
-        case GoalType.TotalActivities:
-          currentValue = relevantActivities.length;
-          break;
-          
-        case GoalType.AveragePace:
-          if (relevantActivities.length > 0) {
-            const totalDistance = relevantActivities.reduce((sum, activity) => 
-              sum + (typeof activity.distance === 'number' ? activity.distance : 0), 0);
-            const totalDuration = relevantActivities.reduce((sum, activity) => 
-              sum + (typeof activity.duration === 'number' ? activity.duration : 0), 0);
-            currentValue = totalDistance > 0 ? totalDuration / 60 / totalDistance : 0;
-          }
-          break;
-          
-        case GoalType.LongestRun:
-          if (relevantActivities.length > 0) {
-            const distances = relevantActivities
-              .filter(a => typeof a.distance === 'number')
-              .map(a => a.distance);
-            currentValue = distances.length > 0 ? Math.max(...distances) : 0;
-          }
-          break;
-          
-        case GoalType.FastestPace:
-          const paces = relevantActivities
-            .filter(a => a.pace && typeof a.pace === 'number' && a.pace > 0)
-            .map(a => a.pace as number);
-          currentValue = paces.length > 0 ? Math.min(...paces) : 0;
-          break;
-      }
-      
-      // Check if goal is completed
-      const isCompleted = goal.goalType === GoalType.AveragePace || goal.goalType === GoalType.FastestPace
-        ? currentValue <= goal.targetValue && currentValue > 0 // Lower is better for pace
-        : currentValue >= goal.targetValue;
-      
-      return { ...goal, currentValue, isCompleted };
-    });
-    
-    localStorage.setItem('running_goals', JSON.stringify(updatedGoals));
-    return Promise.resolve({ data: updatedGoals });
-  }
+  update: (id: number, goal: Goal) => api.put<void>(`/goals/${id}`, goal),
+  delete: (id: number) => api.delete<void>(`/goals/${id}`),
+  getByUserId: (userId: number) => api.get<Goal[]>(`/goals/user/${userId}`),
+  updateProgress: (id: number, currentValue: number) => api.put<void>(`/goals/${id}/progress`, currentValue),
+  updateAllProgress: () => api.put<void>('/goals/updateProgress'),
 };
 
 export default api; 

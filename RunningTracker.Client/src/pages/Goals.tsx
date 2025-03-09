@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Badge, ProgressBar, Modal, Form } from 'react-bootstrap';
-import { Goal, GoalType, GoalTimeframe, goalsApi, RunningActivity, activitiesApi } from '../services/api';
+import { Goal, GoalType, GoalTimeframe, goalsApi, RunningActivity, activitiesApi, CreateGoalDTO } from '../services/api';
 import { formatPace } from '../utils/formatters';
 import { addDays, addWeeks, addMonths, addYears, format } from 'date-fns';
 import '../styles/Goals.css';
@@ -30,16 +30,15 @@ const Goals: React.FC = () => {
       try {
         setLoading(true);
         
-        // Fetch activities
-        const activitiesResponse = await activitiesApi.getAll();
-        setActivities(activitiesResponse.data);
+        // Update goal progress first
+        await goalsApi.updateAllProgress();
         
-        // Fetch goals
+        // Then fetch the updated goals
         const goalsResponse = await goalsApi.getAll();
+        setGoals(goalsResponse.data);
         
-        // Update goal progress
-        const updatedGoalsResponse = await goalsApi.updateProgress(activitiesResponse.data);
-        setGoals(updatedGoalsResponse.data);
+        // Fetch activities for reference (might be needed for UI purposes)
+        await activitiesApi.getAll();
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -127,20 +126,60 @@ const Goals: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Default dates if not provided
+      const defaultStartDate = new Date().toISOString().split('T')[0];
+      const defaultEndDate = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];
+
+      // Validate required fields
+      if (!formData.name) {
+        alert('Goal name is required');
+        return;
+      }
+
+      if (!formData.targetValue || formData.targetValue <= 0) {
+        alert('Target value must be greater than 0');
+        return;
+      }
+
       if (editingGoal) {
-        await goalsApi.update(editingGoal.id!, formData as Goal);
+        // For updating an existing goal
+        const updateData = {
+          ...editingGoal,
+          name: formData.name,
+          description: formData.description || '',
+          targetValue: Number(formData.targetValue),
+          goalType: formData.goalType || GoalType.TotalDistance,
+          timeframe: formData.timeframe || GoalTimeframe.Weekly,
+          startDate: formData.startDate || defaultStartDate,
+          endDate: formData.endDate || defaultEndDate
+        };
+        
+        console.log('Updating goal with data:', updateData);
+        await goalsApi.update(editingGoal.id!, updateData);
       } else {
-        await goalsApi.create(formData as Goal);
+        // For creating a new goal
+        const createData = {
+          name: formData.name,
+          description: formData.description || '',
+          targetValue: Number(formData.targetValue),
+          goalType: formData.goalType || GoalType.TotalDistance,
+          timeframe: formData.timeframe || GoalTimeframe.Weekly,
+          startDate: formData.startDate || defaultStartDate,
+          endDate: formData.endDate || defaultEndDate
+        };
+        
+        console.log('Creating goal with data:', createData);
+        await goalsApi.create(createData);
       }
       
       // Refresh goals
       const goalsResponse = await goalsApi.getAll();
-      const updatedGoalsResponse = await goalsApi.updateProgress(activities);
-      setGoals(updatedGoalsResponse.data);
+      setGoals(goalsResponse.data);
       
       handleCloseModal();
     } catch (error) {
       console.error('Error saving goal:', error);
+      alert('Failed to save goal. Please check the console for details.');
     }
   };
 
@@ -226,13 +265,37 @@ const Goals: React.FC = () => {
     }
   };
 
+  // Add a function to refresh goal progress
+  const refreshGoalProgress = async () => {
+    try {
+      setLoading(true);
+      await goalsApi.updateAllProgress();
+      
+      // Refresh goals after updating progress
+      const goalsResponse = await goalsApi.getAll();
+      setGoals(goalsResponse.data);
+      
+      alert('Goal progress updated successfully!');
+    } catch (error) {
+      console.error('Error updating goal progress:', error);
+      alert('Failed to update goal progress. Please check the console for details.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Running Goals</h1>
-        <Button variant="success" onClick={() => handleShowModal()}>
-          Add New Goal
-        </Button>
+        <div>
+          <Button variant="info" onClick={refreshGoalProgress} className="me-2">
+            Refresh Progress
+          </Button>
+          <Button variant="success" onClick={() => handleShowModal()}>
+            Add New Goal
+          </Button>
+        </div>
       </div>
 
       {loading ? (

@@ -12,6 +12,7 @@ namespace RunningTracker.API.Data
         public DbSet<User> Users { get; set; }
         public DbSet<RunningActivity> RunningActivities { get; set; }
         public DbSet<RunningRoute> Routes { get; set; }
+        public DbSet<Goal> Goals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,12 @@ namespace RunningTracker.API.Data
                 .HasOne(r => r.User)
                 .WithMany(u => u.Routes)
                 .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<Goal>()
+                .HasOne(g => g.User)
+                .WithMany(u => u.Goals)
+                .HasForeignKey(g => g.UserId)
                 .OnDelete(DeleteBehavior.SetNull);
         }
 
@@ -77,6 +84,22 @@ namespace RunningTracker.API.Data
                 .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
             foreach (var entityEntry in routeEntries)
+            {
+                if (entityEntry.State == EntityState.Added)
+                {
+                    entityEntry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    entityEntry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            var goalEntries = ChangeTracker
+                .Entries<Goal>()
+                .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
+
+            foreach (var entityEntry in goalEntries)
             {
                 if (entityEntry.State == EntityState.Added)
                 {

@@ -45,5 +45,6 @@ namespace RunningTracker.API.Models
         // Navigation properties
         public ICollection<RunningActivity>? RunningActivities { get; set; }
         public ICollection<RunningRoute>? Routes { get; set; }
+        public ICollection<Goal>? Goals { get; set; }
     }
 } 
