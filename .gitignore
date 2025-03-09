@@ -28,3 +28,30 @@ build/
 *.userosscache
 *.sln.docstates
 
+# Ignore folders in specific projects
+RunningTracker.API/node_modules/
+RunningTracker.API/.env
+RunningTracker.API/.vs/
+RunningTracker.API/dist/
+RunningTracker.API/obj/
+RunningTracker.API/bin/
+
+# Explicitly ignore all DLL files in the API project
+RunningTracker.API/**/*.dll
+RunningTracker.API/**/*.exe
+RunningTracker.API/**/*.pdb
+RunningTracker.API/**/*.json
+
+# Client ignores
+RunningTracker.Client/node_modules/
+RunningTracker.Client/.env
+RunningTracker.Client/.vs/
+RunningTracker.Client/dist/
+
+# Ignore IDE settings
+.idea/
+RunningTracker.Client/package-lock.json
+
+# Ignore all bin and obj folders recursively
+**/bin/
+**/obj/
